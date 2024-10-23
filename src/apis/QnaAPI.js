@@ -3,6 +3,14 @@ import axios from "axios";
 const hostQuestion = 'http://localhost:8080/api/v1/qna/question';
 const hostAnswer = 'http://localhost:8080/api/v1/qna/answer';
 
+// 조회
+export const getReadQuestion = async (qno) => {
+
+    const res = await axios.get(`${hostQuestion}/${qno}`)
+
+    return res.data
+}
+
 // 리스트
 export const getListQuestion = async (page) => {
 
@@ -28,13 +36,7 @@ export const postAddQuestion = async (formData) => {
     }
 };
 
-// // 조회
-// export const getReadQuestion = async (qno) => {
-//
-//     const res = await axios.get(`${hostQuestion}/${qno}`)
-//
-//     return res.data
-// }
+
 //
 // // 질문 수정
 // export const putEditQuestion = async (question) => {
