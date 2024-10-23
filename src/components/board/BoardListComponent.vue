@@ -11,12 +11,22 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="post in posts" :key="post.bno" class="hover:bg-gray-50">
+      <tr v-for="post in posts" :key="post.bno" class="hover:bg-gray-50 relative">
         <td class="px-4 py-2 border-b border-gray-300">{{ post.bno }}</td>
         <td class="px-4 py-2 border-b border-gray-300">
-          <router-link :to="{ path: `/board/read/${post.bno}` }" class="text-blue-500 hover:underline">
+          <router-link
+              :to="{ path: `/board/read/${post.bno}` }"
+              class="text-blue-500 hover:underline relative"
+              @mouseover="showImage(post.fileName)"
+              @mouseleave="hideImage"
+          >
             {{ post.title }}
           </router-link>
+
+          <!-- 이미지 미리보기 -->
+          <div v-if="hoveredImage === post.fileName" class="absolute left-0 top-8 z-10">
+            <img :src="getImageUrl(post.fileName)" class="w-32 h-auto shadow-md" alt="Preview Image" />
+          </div>
         </td>
         <td class="px-4 py-2 border-b border-gray-300">{{ post.author || 'Anonymous' }}</td>
       </tr>
@@ -27,7 +37,7 @@
     <div class="flex justify-between items-center mt-6">
       <button
           @click="prevPage"
-          :disabled="!pagination.prev"
+          :disabled="pagination.current <= 1"
           class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-300"
       >
         Previous
@@ -39,7 +49,7 @@
 
       <button
           @click="nextPage"
-          :disabled="!pagination.next"
+          :disabled="pagination.current >= pagination.totalPage"
           class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-300"
       >
         Next
@@ -49,17 +59,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import {ref, onMounted, watchEffect} from 'vue';
 import { getBoardList } from '../../apis/boardAPI';
+import {useRoute, useRouter} from "vue-router";
 
 const posts = ref([]);
+const hoveredImage = ref(null); // 마우스 오버된 이미지
 const pagination = ref({
   current: 1,
   totalPage: 1,
   prev: false,
   next: false,
 });
-
+const router = useRouter()
+const route = useRoute()
 // 게시글 리스트를 가져오는 함수
 const fetchBoardList = async () => {
   try {
@@ -74,21 +87,56 @@ const fetchBoardList = async () => {
   }
 };
 
+// 마우스 오버 시 이미지 보여주기
+const showImage = (image) => {
+  hoveredImage.value = image;
+};
+
+// 마우스가 떠나면 이미지 숨기기
+const hideImage = () => {
+  hoveredImage.value = null;
+};
+
+// 이미지 URL 생성 함수 (예시)
+const getImageUrl = (fileName) => {
+  return `http://localhost:8080/uploads/${fileName}`;
+};
+
+// Query 파라미터에서 페이지 번호 감지 및 데이터 가져오기
+watchEffect(() => {
+  const pageQuery = route.query.page;
+  let page = 1;
+
+  // query.page가 배열로 올 가능성을 대비해 배열인지 문자열인지 처리
+  if (Array.isArray(pageQuery)) {
+    page = parseInt(pageQuery[0], 10) || 1;
+  } else {
+    page = parseInt(pageQuery, 10) || 1;
+  }
+
+  // 페이지 값이 바뀔 때마다 해당 페이지의 데이터 가져오기
+  fetchBoardList(page);
+});
+
 // 페이지네이션 처리 함수
 const nextPage = () => {
-  if (pagination.value.next) {
-    pagination.value.current++;
-    fetchBoardList();
+  if (pagination.value.current < pagination.value.totalPage) {
+    router.push({ query: { page: (pagination.value.current + 1).toString() } });
   }
 };
 
 const prevPage = () => {
-  if (pagination.value.prev) {
-    pagination.value.current--;
-    fetchBoardList();
+  if (pagination.value.current > 1) {
+    router.push({ query: { page: (pagination.value.current - 1).toString() } });
   }
 };
 
-// 컴포넌트가 마운트될 때 게시글 리스트를 가져옴
-onMounted(fetchBoardList);
+
 </script>
+
+<style scoped>
+/* 이미지 미리보기 스타일 추가 */
+img {
+  transition: opacity 0.3s ease;
+}
+</style>

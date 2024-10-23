@@ -5,28 +5,43 @@
       <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ boardData.title }}</h2>
       <p class="text-sm text-gray-500">
         <span class="font-semibold">Author:</span> {{ boardData.author || 'Anonymous' }} &bull;
-        <span class="font-semibold">Date:</span> {{ boardData.date || 'N/A' }}
+        <span class="font-semibold">Date:</span> {{ boardData.createTime || 'N/A' }}
+        <span class="font-semibold">Date:</span> {{ boardData.updateTime || 'N/A' }}
       </p>
     </div>
 
     <!-- 내용 섹션 -->
     <div class="mb-8">
+      <!-- 썸네일을 제외한 모든 이미지 출력 -->
+      <div v-if="nonThumbnailFiles.length" class="mb-6">
+        <img
+            v-for="file in nonThumbnailFiles"
+            :src="getImageUrl(file)"
+            :key="file"
+            class="w-1/4 h-auto object-contain rounded-lg mb-4"
+            alt="Attached Image"
+        />
+      </div>
+
+      <!-- 게시글 내용 -->
       <p class="text-lg leading-relaxed text-gray-700">{{ boardData.content }}</p>
     </div>
 
     <!-- 첨부 파일 섹션 -->
-    <div v-if="boardData.filename && boardData.filename.length" class="mb-8">
+    <div v-if="boardData.filename && boardData.filename.length > 1" class="mb-8">
       <h3 class="text-xl font-semibold text-gray-800 mb-2">Attached Files:</h3>
       <ul class="list-disc pl-6 space-y-2">
         <li
-            v-for="file in boardData.filename"
-            :key="file"
-            class="text-blue-500 hover:underline cursor-pointer flex items-center space-x-2"
+            v-for="(file, index) in boardData.filename"
+            v-if="index !== 0"
+        :key="file"
+        class="text-blue-500 hover:underline cursor-pointer flex items-center space-x-2"
         >
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M4 12l6 6M10 6v6M6 10v6h6"></path>
-          </svg>
-          <span>{{ file }}</span>
+        <img v-if="isImage(file)" :src="getImageUrl(file)" class="w-32 h-32 object-contain" alt="Attached Image" />
+        <svg v-else class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M4 12l6 6M10 6v6M6 10v6h6"></path>
+        </svg>
+        <span>{{ file }}</span>
         </li>
       </ul>
     </div>
@@ -56,11 +71,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { getBoardOne, deleteBoardOne } from '../../apis/boardAPI';
+import {ref, onMounted, computed} from 'vue';
+import {useRouter} from 'vue-router';
+import {getBoardOne, deleteBoardOne} from '../../apis/boardAPI';
 
-// props 선언
 const props = defineProps({
   boardNo: {
     type: [Number, String],
@@ -73,38 +87,49 @@ const boardData = ref({
   author: '',
   content: '',
   filename: [],
-  date: '', // 날짜 추가
+  createTime: '',
+  updateTime: '',
 });
 
 const router = useRouter();
 
-// 게시글 데이터 가져오기
 const fetchBoardData = async () => {
   try {
     const response = await getBoardOne(props.boardNo);
-    boardData.value = response.dtoList[0]; // 첫 번째 게시글 데이터
+    boardData.value = response.dtoList[0];
   } catch (error) {
     console.error('Error fetching board data:', error);
   }
 };
+// 썸네일이 아닌 파일 리스트 필터링
+const nonThumbnailFiles = computed(() =>
+    boardData.value.filename.filter(file => !file.startsWith('s_'))
+);
 
-// 목록으로 돌아가기
+const isImage = (fileName) => {
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+  const ext = fileName.split('.').pop().toLowerCase();
+  return imageExtensions.includes(ext);
+};
+
+const getImageUrl = (fileName) => {
+  return `http://localhost:8080/uploads/${fileName}`;
+};
+
 const goBack = () => {
   router.push('/board/list');
 };
 
-// 게시글 수정 페이지로 이동
 const editPost = () => {
   router.push(`/board/update/${props.boardNo}`);
 };
 
-// 게시글 삭제
 const deletePost = async () => {
   if (confirm('Are you sure you want to delete this post?')) {
     try {
       await deleteBoardOne(props.boardNo);
       alert('Post deleted successfully.');
-      router.push('/board/list'); // 삭제 후 목록 페이지로 이동
+      router.push('/board/list');
     } catch (error) {
       console.error('Error deleting post:', error);
       alert('Failed to delete the post.');
@@ -112,7 +137,6 @@ const deletePost = async () => {
   }
 };
 
-// 컴포넌트가 마운트될 때 데이터 가져오기
 onMounted(fetchBoardData);
 </script>
 
