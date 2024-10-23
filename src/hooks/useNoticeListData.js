@@ -1,7 +1,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
-const useListData = (listFn) => {
+const useNoticeListData = (listFn) => {
 
     const fn = listFn;  // 공지사항 리스트 API 함수
 
@@ -80,4 +80,4 @@ const useListData = (listFn) => {
     return { loading, moveToRead, route, router, refresh, result, pageArr };
 };
 
-export default useListData;
+export default useNoticeListData;
