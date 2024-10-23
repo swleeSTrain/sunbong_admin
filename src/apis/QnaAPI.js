@@ -13,18 +13,25 @@ export const getListQuestion = async (page) => {
     return res.data;
 };
 
+// 질문 등록
+export const postAddQuestion = async (formData) => {
+    try {
+        const res = await axios.post(`${hostQuestion}/add`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return res.data;
+    } catch (error) {
+        console.error('Error posting question:', error);
+        throw error;
+    }
+};
+
 // // 조회
 // export const getReadQuestion = async (qno) => {
 //
 //     const res = await axios.get(`${hostQuestion}/${qno}`)
-//
-//     return res.data
-// }
-//
-// // 질문 등록
-// export const postAddQuestion = async (obj) => {
-//
-//     const res = await axios.post(`${hostQuestion}/add`, obj)
 //
 //     return res.data
 // }
