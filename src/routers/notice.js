@@ -10,11 +10,11 @@ const noticeRouting ={
     path: '/notice',
     component: IndexPage,
     children: [
-        { path: "list", component: NoticeListPage},
-        { path: "", redirect: '/notice/list?page=1'},
-        { path: "read/:noticeNo", component: NoticeReadPage},
-        { path: "edit/:noticeNo", component: NoticeEditPage},
-        { path: "add", component: NoticeAddPage}
+        { path: 'list', component: NoticeListPage },
+        { path: '', redirect: '/notice/list?page=1' },  // 기본 경로 리디렉션
+        { path: 'read/:noticeNo', component: NoticeReadPage },
+        { path: 'edit/:noticeNo', component: NoticeEditPage },
+        { path: 'add', component: NoticeAddPage }
     ]
 }
 export default noticeRouting;
