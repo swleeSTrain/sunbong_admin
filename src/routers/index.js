@@ -1,12 +1,12 @@
 import {createRouter, createWebHistory} from "vue-router";
-import noticeRouting from "./notice";
 
-const MainPage = () => import("../pages/MainPage.vue")
+import boardRouting from "./board.js";
+
 
 const routeConfig = createRouter({
     history: createWebHistory(),
     routes: [
-        noticeRouting
+        boardRouting,
     ]
 })
 
