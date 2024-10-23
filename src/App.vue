@@ -12,6 +12,12 @@ import { ref } from 'vue'
         <RouterLink to="/notice/list" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">
           NOTICE
         </RouterLink>
+        <RouterLink to="/qna/question/list" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">
+          QnA
+        </RouterLink>
+        <RouterLink to="/qna/question/add" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">
+          QnA Register
+        </RouterLink>
 <!--        <RouterLink to="/sales-management" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">-->
 <!--          QNA-->
 <!--        </RouterLink>-->
