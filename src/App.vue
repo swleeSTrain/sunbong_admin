@@ -1,19 +1,39 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { ref } from 'vue'
 </script>
 
 <template>
-  <div class="flex justify-center space-x-4">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo transition hover:drop-shadow-[0_0_2em_#646cffaa]" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo transition hover:drop-shadow-[0_0_2em_#42b883aa]" alt="Vue logo" />
-    </a>
+  <div class="min-h-screen flex bg-gradient-to-r from-gray-50 to-white">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-800 text-white p-6 space-y-8 shadow-xl">
+      <h1 class="text-3xl font-bold text-white uppercase tracking-widest">ERP System</h1>
+      <nav class="space-y-4">
+        <!-- RouterLink로 링크를 연결 -->
+        <RouterLink to="/notice/list" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">
+          NOTICE
+        </RouterLink>
+<!--        <RouterLink to="/sales-management" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">-->
+<!--          QNA-->
+<!--        </RouterLink>-->
+<!--        <RouterLink to="/reports" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">-->
+<!--          FAQ-->
+<!--        </RouterLink>-->
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg">
+      <!-- Header -->
+
+
+      <!-- 페이지의 동적인 콘텐츠가 렌더링될 영역 -->
+      <RouterView />
+    </main>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
 <style scoped>
-/* Tailwind로 교체했으므로 기존 스타일을 제거합니다 */
+.read-the-docs {
+  color: #888;
+}
 </style>
