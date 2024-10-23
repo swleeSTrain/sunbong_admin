@@ -1,31 +1,44 @@
-import axios from "axios";
+import axios from "axios"
 
-const host = 'http://localhost:8080/api/v1/notice';
+const host = 'http://localhost:8080/api/v1/notice'
 
-// 리스트
-export const getNoticeList = async (page) => {
-    const response = await axios.get(`${host}/list`, {
-        params: { page: page, size: 10 }  // 페이지 번호와 크기 설정
+export const getList = async (page) => {
+
+    const res = await axios.get(`${host}/list`, {
+        params: { page: page, size: 10 }
     });
-    return response.data;
+
+    return res.data;
 };
 
-// export const getNoticeOne = async (noticeNo) => {
-//     const response = await axios.get(`${host}/${noticeNo}`)
-//     return response.data;
-// }
-//
-// export const postNoticeOne = async (obj) => {
-//     const response = await axios.post(`${host}`, obj);
-//     return response.data;
-// }
-//
-// export const deleteNoticeOne = async (noticeNo) => {
-//     const response = await axios.delete(`${host}/${noticeNo}`);
-//     return response.data;
-// }
-//
-// export const putNoticeOne = async (notice) => {
-//     const response = await axios.put(`${host}/${notice.noticeNo}`, notice);
-//     return response.data;
-// }
+export const getOne = async (noticeNo) => {
+    const res = await axios.get(`${host}/${noticeNo}`)
+
+    return res.data
+}
+
+// 등록
+export const postOne = async (formData) => {
+    const res = await axios.post(`${host}/add`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data', // 파일 업로드 시 필요
+        },
+    });
+
+    return res.data;
+};
+
+
+export const deleteOne = async (noticeNo) => {
+
+    const res = await axios.delete(`${host}/${noticeNo}`)
+
+    return res.data
+}
+
+export const putOne = async (notice) => {
+
+    const res = await axios.put(`${host}/${notice.noticeNo}`, notice)
+    return res.data
+}
+
