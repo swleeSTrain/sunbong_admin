@@ -5,7 +5,8 @@
   <ul class="list-none p-0">
     <li v-for="question in result.dtoList"
         :key="question.qno"
-        class="py-2 border-b border-gray-300">
+        class="py-2 border-b border-gray-300"
+        @click="moveToRead(question.qno)">
       <span class="font-medium">{{ question.title }}</span>
       <span class="text-sm text-gray-500"> - {{ question.writer }}</span>
       <span class="text-xs text-gray-400"> - {{ question.createdDate }}</span>
@@ -33,5 +34,5 @@ import useListData from '../../hooks/useListData.js';
 import { getListQuestion } from '../../apis/QnaAPI.js';
 
 // useListData 훅 호출
-const { result, pageArr, loadPageData } = useListData(getListQuestion);
+const { result, pageArr, loadPageData, moveToRead } = useListData(getListQuestion);
 </script>
