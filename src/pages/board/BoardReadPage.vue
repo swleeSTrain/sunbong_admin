@@ -1,12 +1,18 @@
-<script setup>
-
-import BoardReadComponent from "../../components/board/BoardReadComponent.vue";
-</script>
-
 <template>
-<BoardReadComponent></BoardReadComponent>
+  <div>
+    <BoardReadComponent :boardNo="boardNo" />
+  </div>
 </template>
 
-<style scoped>
+<script setup>
+import { defineProps } from 'vue';
+import BoardReadComponent from "../../components/board/BoardReadComponent.vue";
 
-</style>
+// Using defineProps for props declaration in script setup
+const props = defineProps({
+  boardNo: {
+    type: Number,
+    required: true
+  }
+});
+</script>

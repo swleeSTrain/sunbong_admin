@@ -1,29 +1,49 @@
 <template>
-  <div class="board-list">
-    <h2>Board Post List</h2>
+  <div class="board-list max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-gray-700 mb-6">자유게시판</h2>
 
-    <table class="table-auto w-full">
+    <table class="min-w-full table-auto bg-white border border-gray-300">
       <thead>
-      <tr>
-        <th>#</th>
-        <th>Title</th>
-        <th>Author</th>
+      <tr class="bg-gray-100">
+        <th class="px-4 py-2 text-left border-b-2 border-gray-300">글번호</th>
+        <th class="px-4 py-2 text-left border-b-2 border-gray-300">Title</th>
+        <th class="px-4 py-2 text-left border-b-2 border-gray-300">Author</th>
       </tr>
       </thead>
       <tbody>
-      <tr v-for="post in posts" :key="post.bno">
-        <td>{{ post.bno }}</td>
-        <td>{{ post.title }}</td>
-        <td>{{ post.author || 'Anonymous' }}</td>
+      <tr v-for="post in posts" :key="post.bno" class="hover:bg-gray-50">
+        <td class="px-4 py-2 border-b border-gray-300">{{ post.bno }}</td>
+        <td class="px-4 py-2 border-b border-gray-300">
+          <router-link :to="{ path: `/board/read/${post.bno}` }" class="text-blue-500 hover:underline">
+            {{ post.title }}
+          </router-link>
+        </td>
+        <td class="px-4 py-2 border-b border-gray-300">{{ post.author || 'Anonymous' }}</td>
       </tr>
       </tbody>
     </table>
 
     <!-- 페이지네이션 -->
-    <div class="pagination">
-      <button @click="prevPage" :disabled="!pagination.prev">Previous</button>
-      <span>Page {{ pagination.current }} of {{ pagination.totalPage }}</span>
-      <button @click="nextPage" :disabled="!pagination.next">Next</button>
+    <div class="flex justify-between items-center mt-6">
+      <button
+          @click="prevPage"
+          :disabled="!pagination.prev"
+          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-300"
+      >
+        Previous
+      </button>
+
+      <span class="text-gray-700">
+        Page {{ pagination.current }} of {{ pagination.totalPage }}
+      </span>
+
+      <button
+          @click="nextPage"
+          :disabled="!pagination.next"
+          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-300"
+      >
+        Next
+      </button>
     </div>
   </div>
 </template>
@@ -72,43 +92,3 @@ const prevPage = () => {
 // 컴포넌트가 마운트될 때 게시글 리스트를 가져옴
 onMounted(fetchBoardList);
 </script>
-
-<style scoped>
-.table-auto {
-  margin: 20px 0;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-th {
-  background-color: #f2f2f2;
-  text-align: center;
-}
-
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-button {
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #ccc;
-}
-
-button:hover:enabled {
-  background-color: #45a049;
-}
-</style>

@@ -48,7 +48,7 @@ export const deleteBoardOne = async (bno) => {
 }
 
 // 게시글을 수정하는 함수 (JSON 데이터 + 파일)
-export const putBoardOne = async (bno, boardData, files) => {
+export const putBoardOne = async (bno, boardData, files = []) => {
     const formData = new FormData();
 
     // boardData의 모든 필드를 FormData에 추가
@@ -56,17 +56,24 @@ export const putBoardOne = async (bno, boardData, files) => {
         formData.append(key, boardData[key]);
     }
 
-    // 파일이 있으면 파일 추가
-    if (files) {
+    // 파일이 있으면 파일 추가 (빈 배열이면 추가하지 않음)
+
+    if (files.length > 0) {
         files.forEach(file => {
-            formData.append('files', file);
+            formData.append('files', file);  // 'files' 키로 파일 전송
         });
     }
 
-    const response = await axios.put(`${host}/${bno}`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
-    return response.data;
-}
+    try {
+        const response = await axios.put(`${host}/${bno}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data', // 생략해도 무방
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating post:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+

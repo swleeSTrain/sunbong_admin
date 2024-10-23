@@ -8,8 +8,8 @@ const boardRouting={
     children: [
         { path: "list", component: BoardListPage},
         { path: "", redirect: '/board/list?page=1'},
-        { path: "read/:noticeNo", component: BoardReadPage},
-        { path: "edit/:noticeNo", component: BoardUpdatePage},
+        { path: "read/:boardNo", component: BoardReadPage, props: true },
+        { path: "update/:boardNo", component: BoardUpdatePage, props: true },
         { path: "add", component: BoardAddPage}
     ]
 
