@@ -3,19 +3,17 @@ import axios from "axios";
 const hostQuestion = 'http://localhost:8080/api/v1/qna/question';
 const hostAnswer = 'http://localhost:8080/api/v1/qna/answer';
 
-// 조회
-export const getReadQuestion = async (qno) => {
-
-    const res = await axios.get(`${hostQuestion}/${qno}`)
-
-    return res.data
-}
-
 // 리스트
-export const getListQuestion = async (page) => {
+export const getListQuestion = async (page, searchParams = {}) => {
+    const { type, keyword } = searchParams;
 
     const res = await axios.get(`${hostQuestion}/list`, {
-        params: { page: page, size: 10 }  // 페이지 번호와 크기 설정
+        params: {
+            page: page,
+            size: 10,
+            type: type || 'all',
+            keyword: keyword || '',
+        },
     });
 
     return res.data;
@@ -36,23 +34,38 @@ export const postAddQuestion = async (formData) => {
     }
 };
 
+// 조회
+export const getReadQuestion = async (qno) => {
 
-//
-// // 질문 수정
-// export const putEditQuestion = async (question) => {
-//
-//     const res = await axios.put(`${hostQuestion}/${question.qno}`, question)
-//
-//     return res.data
-// }
-//
-// // 질문 삭제
-// export const deleteQuestion = async (qno) => {
-//
-//     const res = await axios.delete(`${hostQuestion}/${qno}`)
-//
-//     return res.data
-// }
+    const res = await axios.get(`${hostQuestion}/${qno}`)
+
+    return res.data
+}
+
+// 질문 삭제
+export const deleteQuestion = async (qno) => {
+
+    const res = await axios.delete(`${hostQuestion}/${qno}`)
+
+    return res.data
+}
+
+// 질문 수정
+export const putEditQuestion = async (qno, formData) => {
+    try {
+        const res = await axios.put(`${hostQuestion}/${qno}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data', // FormData 전송을 위해 헤더를 설정
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.error('Error during question update API call:', error);
+        throw error;
+    }
+};
+
+
 //
 // // 답변 등록
 // export const postAddQuestion = async (obj) => {

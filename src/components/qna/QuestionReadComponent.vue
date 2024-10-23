@@ -1,53 +1,86 @@
 <template>
-  <div>
-    <h1 class="text-2xl font-bold mb-4">Question Detail</h1>
+  <div class="max-w-2xl mx-auto p-6 bg-gray-50 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-4">Question Read Component</h1>
+
+    <div class="mb-4">
+      <button
+          class="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700 transition duration-200"
+          @click="moveToList()">
+        LIST
+      </button>
+    </div>
+
+    <div class="mb-4">
+      <button
+          class="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700 transition duration-200"
+          @click="moveToEdit(question.qno)">
+        EDIT
+      </button>
+    </div>
+
     <div v-if="question">
-      <h2 class="text-xl font-bold">{{ question.questionTitle }}</h2>
-      <p class="text-sm text-gray-500">작성자: {{ question.questionWriter }}</p>
-      <p class="text-sm text-gray-500">작성일: {{ question.questionCreatedDate }}</p>
+      <h2 class="text-xl font-semibold mb-2">제목: {{ question.questionTitle }}</h2>
+      <p class="text-sm text-gray-600">작성자: {{ question.questionWriter }}</p>
+      <p class="text-sm text-gray-600">작성일: {{ question.questionCreatedDate }}</p>
+
       <div class="mt-4">
-        <p>{{ question.questionContent }}</p>
+        <p class="text-base font-medium">내용:</p>
+        <p class="text-gray-800 mb-4">{{ question.questionContent }}</p>
+
         <div v-if="question.attachFiles && question.attachFiles.length > 0">
           <h3 class="font-medium mt-4">첨부 이미지:</h3>
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
             <img
                 v-for="(file, index) in question.attachFiles"
                 :key="index"
                 :src="`http://localhost:8080/uploads/${file}`"
                 alt="첨부 이미지"
-                class="w-full h-auto border rounded-md"
+                class="w-full h-auto border border-gray-300 rounded-md shadow-sm"
             />
-
           </div>
         </div>
       </div>
 
-      <!-- 답변 목록 -->
-      <p class="text-sm text-gray-500 mt-4">=======================</p>
-      <p class="text-sm text-gray-500">답변</p>
-      <div v-for="(answer, index) in question.answers" :key="index" class="mt-2 border-b pb-2">
-        <p class="text-sm text-gray-500">내용: {{ answer.answerContent }}</p>
-        <p class="text-sm text-gray-500">작성자: {{ answer.answerWriter }}</p>
-        <p class="text-sm text-gray-500">작성날짜: {{ answer.answerCreatedDate }}</p>
-      </div>
+      <AnswerReadComponent :answers="question.answers" />
     </div>
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue';
-import {useRoute} from 'vue-router';
-import {getReadQuestion} from '../../apis/QnaAPI.js';
+import { onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { getReadQuestion } from '../../apis/QnaAPI.js';
+import AnswerReadComponent from './AnswerReadComponent.vue';
+import { usePage } from '../../store/usePage';
 
+// Pinia에서 페이지 스토어 가져오기
+const pageStore = usePage();
+const route = useRoute();
+const router = useRouter();
 const question = ref(null);
 
-const route = useRoute();
+// 수정 페이지로 이동
+const moveToEdit = (qno) => {
+  router.push(`/qna/question/edit/${qno}`);
+};
+
+// 리스트 페이지로 이동
+const moveToList = () => {
+  // Pinia에서 현재 페이지를 가져와 쿼리스트링에 붙이기
+  const currentPage = pageStore.currentPage;
+  router.push({ path: `/qna/question/list/`, query: { page: currentPage } });
+};
 
 onMounted(async () => {
   try {
     const qno = route.params.qno;
     const data = await getReadQuestion(qno);
     question.value = data.dtoList[0];  // dtoList에서 첫 번째 항목을 사용
+
+    // Pinia에서 현재 페이지를 가져와 쿼리스트링에 붙이기
+    const currentPage = pageStore.currentPage;
+    router.push({ query: { page: currentPage } });
+
   } catch (error) {
     console.error('Failed to fetch question details:', error);
   }

@@ -86,7 +86,7 @@ const form = ref({
 // 파일 입력을 참조하는 변수
 const fileInput = ref(null);
 
-// Form 제출 핸들러
+// // 파일 업로드로 인해 formData의 형태로
 const handleSubmit = async () => {
   const formData = new FormData();
   formData.append('title', form.value.title);
