@@ -5,8 +5,8 @@
       <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ boardData.title }}</h2>
       <p class="text-sm text-gray-500">
         <span class="font-semibold">Author:</span> {{ boardData.author || 'Anonymous' }} &bull;
-        <span class="font-semibold">Date:</span> {{ boardData.createTime || 'N/A' }}
-        <span class="font-semibold">Date:</span> {{ boardData.updateTime || 'N/A' }}
+        <span class="font-semibold">Created:</span> {{ boardData.createTime || 'N/A' }} &bull;
+        <span class="font-semibold">Updated:</span> {{ boardData.updateTime || 'N/A' }}
       </p>
     </div>
 
@@ -28,20 +28,19 @@
     </div>
 
     <!-- 첨부 파일 섹션 -->
-    <div v-if="boardData.filename && boardData.filename.length > 1" class="mb-8">
+    <div v-if="boardData.filename && boardData.filename.length > 0" class="mb-8">
       <h3 class="text-xl font-semibold text-gray-800 mb-2">Attached Files:</h3>
       <ul class="list-disc pl-6 space-y-2">
         <li
-            v-for="(file, index) in boardData.filename"
-            v-if="index !== 0"
-        :key="file"
-        class="text-blue-500 hover:underline cursor-pointer flex items-center space-x-2"
+            v-for="file in boardData.filename"
+            :key="file"
+            class="text-blue-500 hover:underline cursor-pointer flex items-center space-x-2"
         >
-        <img v-if="isImage(file)" :src="getImageUrl(file)" class="w-32 h-32 object-contain" alt="Attached Image" />
-        <svg v-else class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M4 12l6 6M10 6v6M6 10v6h6"></path>
-        </svg>
-        <span>{{ file }}</span>
+          <img v-if="isImage(file)" :src="getImageUrl(file)" class="w-32 h-32 object-contain" alt="Attached Image" />
+          <svg v-else class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2h12a2 2v-2M4 12l6 6M10 6v6M6 10v6h6"></path>
+          </svg>
+          <span>{{ file }}</span>
         </li>
       </ul>
     </div>
@@ -71,13 +70,13 @@
 </template>
 
 <script setup>
-import {ref, onMounted, computed} from 'vue';
-import {useRouter} from 'vue-router';
-import {getBoardOne, deleteBoardOne} from '../../apis/boardAPI';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { getBoardOne, deleteBoardOne } from '../../apis/boardAPI';
 
 const props = defineProps({
   boardNo: {
-    type: [Number, String],
+    type: String,
     required: true,
   }
 });
@@ -96,11 +95,16 @@ const router = useRouter();
 const fetchBoardData = async () => {
   try {
     const response = await getBoardOne(props.boardNo);
-    boardData.value = response.dtoList[0];
+    if (response && response.dtoList && response.dtoList.length > 0) {
+      boardData.value = response.dtoList[0];
+    } else {
+      console.error('No data found for the given board number.');
+    }
   } catch (error) {
     console.error('Error fetching board data:', error);
   }
 };
+
 // 썸네일이 아닌 파일 리스트 필터링
 const nonThumbnailFiles = computed(() =>
     boardData.value.filename.filter(file => !file.startsWith('s_'))
@@ -112,9 +116,9 @@ const isImage = (fileName) => {
   return imageExtensions.includes(ext);
 };
 
-const getImageUrl = (fileName) => {
-  return `http://localhost:8080/uploads/${fileName}`;
-};
+const BASE_URL = "http://localhost:8080/uploads/";
+
+const getImageUrl = (fileName) => `${BASE_URL}${fileName}`;
 
 const goBack = () => {
   router.push('/board/list');
@@ -128,11 +132,10 @@ const deletePost = async () => {
   if (confirm('Are you sure you want to delete this post?')) {
     try {
       await deleteBoardOne(props.boardNo);
-      alert('Post deleted successfully.');
-      router.push('/board/list');
+      console.log('Post deleted successfully.');
+      goBack();
     } catch (error) {
       console.error('Error deleting post:', error);
-      alert('Failed to delete the post.');
     }
   }
 };

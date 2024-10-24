@@ -62,26 +62,22 @@ export default {
         author: '',
         content: '',
       },
-      files: [],  // 첨부 파일 리스트
+      files: [],
     };
   },
   methods: {
     handleFiles(event) {
-      this.files = Array.from(event.target.files); // 파일을 배열로 변환
+      this.files = Array.from(event.target.files);
     },
     async handleSubmit() {
       try {
         const response = await postBoardOne(this.postForm, this.files);
         alert('Post created with ID: ' + response);
-        this.resetForm();
+        this.$router.push('/board/list');
       } catch (error) {
         console.error('Error creating post:', error);
         alert('Failed to create post');
       }
-    },
-    resetForm() {
-      this.postForm = {title: '', author: '', content: ''};
-      this.files = [];
     },
   },
 };

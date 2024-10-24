@@ -1,7 +1,24 @@
 <template>
   <div class="board-list max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
     <h2 class="text-2xl font-bold text-gray-700 mb-6">자유게시판</h2>
-
+    <!-- 검색 필드 -->
+    <div class="flex items-center space-x-2 mb-4">
+      <select v-model="searchParams.type" class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="all">All</option>
+        <option value="title">Title</option>
+        <option value="content">Content</option>
+        <option value="writer">Writer</option>
+      </select>
+      <input
+          v-model="searchParams.keyword"
+          type="text"
+          placeholder="검색어를 입력하세요"
+          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button @click="search" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none">
+        검색
+      </button>
+    </div>
     <table class="min-w-full table-auto bg-white border border-gray-300">
       <thead>
       <tr class="bg-gray-100">
@@ -11,81 +28,83 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="post in posts" :key="post.bno" class="hover:bg-gray-50 relative">
-        <td class="px-4 py-2 border-b border-gray-300">{{ post.bno }}</td>
+      <tr v-for="result in result.dtoList" :key="result.bno" class="hover:bg-gray-50 relative">
+        <td class="px-4 py-2 border-b border-gray-300">{{ result.bno }}</td>
         <td class="px-4 py-2 border-b border-gray-300">
           <router-link
-              :to="{ path: `/board/read/${post.bno}` }"
+              :to="{ path: `/board/read/${result.bno}` }"
               class="text-blue-500 hover:underline relative"
-              @mouseover="showImage(post.fileName)"
+              @mouseover="showImage(result.fileName)"
               @mouseleave="hideImage"
           >
-            {{ post.title }}
+            {{ result.title }}
           </router-link>
 
           <!-- 이미지 미리보기 -->
-          <div v-if="hoveredImage === post.fileName" class="absolute left-0 top-8 z-10">
-            <img :src="getImageUrl(post.fileName)" class="w-32 h-auto shadow-md" alt="Preview Image" />
+          <div v-if="hoveredImage === result.fileName" class="absolute left-0 top-8 z-10">
+            <img :src="getImageUrl(result.fileName)" class="w-32 h-auto shadow-md" alt="Preview Image" />
           </div>
         </td>
-        <td class="px-4 py-2 border-b border-gray-300">{{ post.author || 'Anonymous' }}</td>
+        <td class="px-4 py-2 border-b border-gray-300">{{ result.author || 'Anonymous' }}</td>
       </tr>
       </tbody>
     </table>
 
-    <!-- 페이지네이션 -->
-    <div class="flex justify-between items-center mt-6">
-      <button
-          @click="prevPage"
-          :disabled="pagination.current <= 1"
-          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-300"
-      >
-        Previous
-      </button>
+    <!-- 페이징 처리 -->
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="inline-flex items-center space-x-px">
+        <!-- 이전 페이지 버튼 -->
+        <li v-if="result.pageRequestDTO.page > 1">
+          <button
+              @click="loadPageData(result.pageRequestDTO.page - 1)"
+              class="px-3 py-1 bg-gray-200 rounded-l hover:bg-gray-300"
+          >
+            이전
+          </button>
+        </li>
 
-      <span class="text-gray-700">
-        Page {{ pagination.current }} of {{ pagination.totalPage }}
-      </span>
+        <!-- 페이지 번호 버튼 -->
+        <li v-for="page in pageArr" :key="'page-' + page.page">
+          <button
+              @click="loadPageData(page.page)"
+              :class="{ 'bg-blue-500 text-white': page.page === result.pageRequestDTO.page, 'bg-gray-200': page.page !== result.pageRequestDTO.page }"
+              class="px-3 py-1 hover:bg-blue-600 hover:text-white transition-colors duration-200"
+          >
+            {{ page.label }}
+          </button>
+        </li>
 
+        <!-- 다음 페이지 버튼 -->
+        <li v-if="result.pageRequestDTO.page < result.totalPage">
+          <button
+              @click="loadPageData(result.pageRequestDTO.page + 1)"
+              class="px-3 py-1 bg-gray-200 rounded-r hover:bg-gray-300"
+          >
+            다음
+          </button>
+        </li>
+      </ul>
+    </nav>
+    <!-- 게시글 작성 버튼 -->
+    <div class="flex justify-end mt-6">
       <button
-          @click="nextPage"
-          :disabled="pagination.current >= pagination.totalPage"
-          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md disabled:bg-gray-100 disabled:text-gray-400 hover:bg-gray-300"
+          @click="$router.push('/board/add')"
+          class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition"
       >
-        Next
+        새 글 작성
       </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted, watchEffect} from 'vue';
+import {ref} from 'vue';
 import { getBoardList } from '../../apis/boardAPI';
-import {useRoute, useRouter} from "vue-router";
 
-const posts = ref([]);
+
 const hoveredImage = ref(null); // 마우스 오버된 이미지
-const pagination = ref({
-  current: 1,
-  totalPage: 1,
-  prev: false,
-  next: false,
-});
-const router = useRouter()
-const route = useRoute()
-// 게시글 리스트를 가져오는 함수
-const fetchBoardList = async () => {
-  try {
-    const response = await getBoardList(pagination.value.current);
-    posts.value = response.dtoList; // 게시글 목록
-    pagination.value.current = response.pageRequestDTO.page; // 현재 페이지
-    pagination.value.totalPage = response.totalPage; // 전체 페이지 수
-    pagination.value.prev = response.prev; // 이전 페이지 존재 여부
-    pagination.value.next = response.next; // 다음 페이지 존재 여부
-  } catch (error) {
-    console.error("Failed to fetch board list:", error);
-  }
-};
+
+import useListData from '../../hooks/useListData.js';
 
 // 마우스 오버 시 이미지 보여주기
 const showImage = (image) => {
@@ -102,35 +121,8 @@ const getImageUrl = (fileName) => {
   return `http://localhost:8080/uploads/${fileName}`;
 };
 
-// Query 파라미터에서 페이지 번호 감지 및 데이터 가져오기
-watchEffect(() => {
-  const pageQuery = route.query.page;
-  let page = 1;
-
-  // query.page가 배열로 올 가능성을 대비해 배열인지 문자열인지 처리
-  if (Array.isArray(pageQuery)) {
-    page = parseInt(pageQuery[0], 10) || 1;
-  } else {
-    page = parseInt(pageQuery, 10) || 1;
-  }
-
-  // 페이지 값이 바뀔 때마다 해당 페이지의 데이터 가져오기
-  fetchBoardList(page);
-});
-
-// 페이지네이션 처리 함수
-const nextPage = () => {
-  if (pagination.value.current < pagination.value.totalPage) {
-    router.push({ query: { page: (pagination.value.current + 1).toString() } });
-  }
-};
-
-const prevPage = () => {
-  if (pagination.value.current > 1) {
-    router.push({ query: { page: (pagination.value.current - 1).toString() } });
-  }
-};
-
+// useListData 훅 호출
+const { result, pageArr, loadPageData, moveToRead, searchParams, search } = useListData(getBoardList);
 
 </script>
 

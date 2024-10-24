@@ -11,7 +11,7 @@ import BoardReadComponent from "../../components/board/BoardReadComponent.vue";
 // Using defineProps for props declaration in script setup
 const props = defineProps({
   boardNo: {
-    type: Number,
+    type: String,
     required: true
   }
 });

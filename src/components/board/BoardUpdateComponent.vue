@@ -1,26 +1,48 @@
 <template>
-  <div>
-    <h2>Edit Post</h2>
-    <form @submit.prevent="submitForm">
+  <div class="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-gray-700 mb-4">Edit Post</h2>
+    <form @submit.prevent="submitForm" class="space-y-4">
       <div>
-        <label for="title">Title</label>
-        <input type="text" id="title" v-model="boardData.title" required />
+        <label for="title" class="block text-gray-600 font-medium">Title:</label>
+        <input
+            type="text"
+            id="title"
+            v-model="boardData.title"
+            required
+            class="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
       </div>
       <div>
-        <label for="content">Content</label>
-        <textarea id="content" v-model="boardData.content" required></textarea>
+        <label for="content" class="block text-gray-600 font-medium">Content:</label>
+        <textarea
+            id="content"
+            v-model="boardData.content"
+            required
+            class="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        ></textarea>
       </div>
       <div>
-        <label for="files">Attach Files</label>
-        <input type="file" id="files" @change="handleFileUpload" multiple />
+        <label for="files" class="block text-gray-600 font-medium">Attach Files:</label>
+        <input
+            type="file"
+            id="files"
+            multiple
+            @change="handleFileUpload"
+            class="mt-2 text-gray-600"
+        />
       </div>
-      <button type="submit">Update Post</button>
+      <button
+          type="submit"
+          class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
+      >
+        Update Post
+      </button>
     </form>
   </div>
 </template>
 
 <script>
-import { putBoardOne } from "../../apis/boardApi"; // 게시글 수정 API 호출 함수
+import { putBoardOne } from "../../apis/boardApi";
 
 export default {
   props: {
@@ -35,33 +57,24 @@ export default {
         title: "",
         content: "",
       },
-      files: [], // 첨부된 파일을 저장할 배열
+      files: [],
     };
   },
   methods: {
     handleFileUpload(event) {
-      this.files = Array.from(event.target.files); // 선택된 파일을 배열로 저장
+      this.files = Array.from(event.target.files);
     },
     async submitForm() {
       try {
-        const response = await putBoardOne(this.boardBno, this.boardData, this.files); // 게시글 수정 API 호출
+        const response = await putBoardOne(this.boardBno, this.boardData, this.files);
         console.log("Post updated successfully:", response);
-        this.$emit("post-updated"); // 부모 컴포넌트로 수정 완료 이벤트 전달
+        this.$emit("post-updated");
       } catch (error) {
         console.error("Error updating post:", error);
       }
     },
   },
-  created() {
-    // 기존 게시글 데이터를 API를 통해 불러오는 로직이 있을 경우 여기에 추가
-    // 예시:
-    // axios.get(`/api/board/${this.editBno}`).then(response => {
-    //   this.boardData = response.data;
-    // });
-  },
 };
 </script>
 
-<style scoped>
-/* 스타일 필요 시 추가 */
-</style>
+<style scoped></style>

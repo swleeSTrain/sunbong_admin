@@ -3,9 +3,15 @@ import axios from "axios";
 const host = 'http://localhost:8080/api/v1/board';
 
 // 게시글 리스트를 가져오는 함수 (페이징 처리)
-export const getBoardList = async (page) => {
+export const getBoardList = async (page, searchParams = {}) => {
+    const { type = 'all', keyword = '' } = searchParams; // searchParams에서 type과 keyword 추출
     const response = await axios.get(`${host}/list`, {
-        params: { page: page, size: 10 }
+        params: {
+            page: page,
+            size: 10,
+            type: type,
+            keyword: keyword,
+        },
     });
     return response.data;
 }
@@ -25,8 +31,8 @@ export const postBoardOne = async (boardData, files = []) => {
         formData.append(key, boardData[key]);
     }
 
-    // 파일 리스트 추가
-    if (Array.isArray(files) && files.length > 0) {
+    // 파일이 있을 경우에만 FormData에 파일 추가
+    if (files && files.length > 0) {
         files.forEach((file) => {
             formData.append('files', file);  // 서버에서 List<MultipartFile>로 처리
         });
