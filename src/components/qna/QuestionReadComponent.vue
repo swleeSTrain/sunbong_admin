@@ -52,9 +52,11 @@ import { useRoute, useRouter } from 'vue-router';
 import { getReadQuestion } from '../../apis/QnaAPI.js';
 import AnswerReadComponent from './AnswerReadComponent.vue';
 import { usePage } from '../../store/usePage';
+import { useSearch } from '../../store/useSearch'; // 검색 조건 스토어 가져오기
 
-// Pinia에서 페이지 스토어 가져오기
+// Pinia에서 페이지 및 검색 조건 스토어 가져오기
 const pageStore = usePage();
+const searchStore = useSearch();
 const route = useRoute();
 const router = useRouter();
 const question = ref(null);
@@ -75,14 +77,20 @@ onMounted(async () => {
   try {
     const qno = route.params.qno;
     const data = await getReadQuestion(qno);
-    question.value = data.dtoList[0];  // dtoList에서 첫 번째 항목을 사용
+    question.value = data.dtoList[0];
 
-    // Pinia에서 현재 페이지를 가져와 쿼리스트링에 붙이기
+    // Pinia에서 현재 페이지와 검색 조건을 가져와 쿼리스트링에 붙이기
     const currentPage = pageStore.currentPage;
-    router.push({ query: { page: currentPage } });
+    const searchParams = {
+      type: searchStore.type,    // 검색 타입
+      keyword: searchStore.keyword // 검색 키워드
+    };
+
+    router.push({ query: { page: currentPage, ...searchParams } });
 
   } catch (error) {
     console.error('Failed to fetch question details:', error);
   }
 });
 </script>
+
