@@ -19,13 +19,21 @@
     </div>
 
     <div v-if="question">
-      <h2 class="text-xl font-semibold mb-2">제목: {{ question.questionTitle }}</h2>
-      <p class="text-sm text-gray-600">작성자: {{ question.questionWriter }}</p>
-      <p class="text-sm text-gray-600">작성일: {{ question.questionCreatedDate }}</p>
+      <h2 class="text-xl font-semibold mb-2">제목: {{ question.title }}</h2>
+      <p class="text-sm text-gray-600">작성자: {{ question.writer }}</p>
+      <p class="text-sm text-gray-600">작성일: {{ question.createdDate }}</p>
+      <p class="text-sm text-gray-600">수정일: {{ question.modifiedDate }}</p>
+
+      <div v-if="question.tags && question.tags.length > 0" class="mt-2">
+        <p class="font-medium">태그:</p>
+        <ul class="list-disc ml-5">
+          <li v-for="(tag, index) in question.tags" :key="index" class="text-gray-700">{{ tag }}</li>
+        </ul>
+      </div>
 
       <div class="mt-4">
         <p class="text-base font-medium">내용:</p>
-        <p class="text-gray-800 mb-4">{{ question.questionContent }}</p>
+        <p class="text-gray-800 mb-4">{{ question.content }}</p>
 
         <div v-if="question.attachFiles && question.attachFiles.length > 0">
           <h3 class="font-medium mt-4">첨부 이미지:</h3>
@@ -52,25 +60,36 @@ import { useRoute, useRouter } from 'vue-router';
 import { getReadQuestion } from '../../apis/QnaAPI.js';
 import AnswerReadComponent from './AnswerReadComponent.vue';
 import { usePage } from '../../store/usePage';
-import { useSearch } from '../../store/useSearch'; // 검색 조건 스토어 가져오기
+import { useSearch } from '../../store/useSearch';
 
-// Pinia에서 페이지 및 검색 조건 스토어 가져오기
 const pageStore = usePage();
 const searchStore = useSearch();
 const route = useRoute();
 const router = useRouter();
 const question = ref(null);
 
-// 수정 페이지로 이동
 const moveToEdit = (qno) => {
-  router.push(`/qna/question/edit/${qno}`);
+
+  const currentPage = pageStore.currentPage;
+  const searchParams = {
+    type: searchStore.type,
+    keyword: searchStore.keyword,
+    tags: searchStore.tags ? searchStore.tags.join(',') : ''
+  };
+
+  router.push({ path: `/qna/question/edit/${qno}`, query: { page: currentPage, ...searchParams } });
 };
 
-// 리스트 페이지로 이동
 const moveToList = () => {
-  // Pinia에서 현재 페이지를 가져와 쿼리스트링에 붙이기
+  // 페이지와 검색 조건을 가져와서 쿼리스트링을 유지
   const currentPage = pageStore.currentPage;
-  router.push({ path: `/qna/question/list/`, query: { page: currentPage } });
+  const searchParams = {
+    type: searchStore.type,
+    keyword: searchStore.keyword,
+    tags: searchStore.tags ? searchStore.tags.join(',') : '' // tags 배열을 문자열로 변환
+  };
+
+  router.push({ path: `/qna/question/list/`, query: { page: currentPage, ...searchParams } });
 };
 
 onMounted(async () => {
@@ -79,18 +98,17 @@ onMounted(async () => {
     const data = await getReadQuestion(qno);
     question.value = data.dtoList[0];
 
-    // Pinia에서 현재 페이지와 검색 조건을 가져와 쿼리스트링에 붙이기
-    const currentPage = pageStore.currentPage;
-    const searchParams = {
-      type: searchStore.type,    // 검색 타입
-      keyword: searchStore.keyword // 검색 키워드
-    };
+    // 쿼리스트링에서 페이지와 검색 조건 가져와 Pinia 상태로 저장
+    const page = route.query.page ? parseInt(route.query.page, 10) : pageStore.currentPage;
+    const type = route.query.type || searchStore.type || 'all';
+    const keyword = route.query.keyword || searchStore.keyword || '';
+    const tags = route.query.tags ? route.query.tags.split(',') : searchStore.tags || []; // tags를 추가합니다.
 
-    router.push({ query: { page: currentPage, ...searchParams } });
-
+    pageStore.setCurrentPage(page);
+    searchStore.setSearchParams(type, keyword, tags); // tags를 상태에 저장합니다.
   } catch (error) {
     console.error('Failed to fetch question details:', error);
   }
 });
-</script>
 
+</script>

@@ -9,7 +9,11 @@ export const usePage = defineStore('page', () => {
         currentPage.value = page;
     }
 
-    return { currentPage, setCurrentPage };
+    const clean = () => {
+        currentPage.value = 1;
+    };
+
+    return { currentPage, setCurrentPage, clean };
 })
 
 export default usePage

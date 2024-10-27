@@ -5,14 +5,15 @@ const hostAnswer = 'http://localhost:8080/api/v1/qna/answer';
 
 // 리스트
 export const getListQuestion = async (page, searchParams = {}) => {
-    const { type, keyword } = searchParams;
+    const { type, keyword, tags } = searchParams;
 
     const res = await axios.get(`${hostQuestion}/list`, {
         params: {
             page: page,
             size: 10,
-            type: type || 'all',
-            keyword: keyword || '',
+            type: type || null,
+            keyword: keyword || null,
+            tags: tags || null,
         },
     });
 
@@ -21,12 +22,14 @@ export const getListQuestion = async (page, searchParams = {}) => {
 
 // 질문 등록
 export const postAddQuestion = async (formData) => {
+
     try {
         const res = await axios.post(`${hostQuestion}/add`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         });
+
         return res.data;
     } catch (error) {
         console.error('Error posting question:', error);
@@ -52,12 +55,15 @@ export const deleteQuestion = async (qno) => {
 
 // 질문 수정
 export const putEditQuestion = async (qno, formData) => {
+
     try {
+
         const res = await axios.put(`${hostQuestion}/${qno}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data', // FormData 전송을 위해 헤더를 설정
             },
         });
+
         return res.data;
     } catch (error) {
         console.error('Error during question update API call:', error);

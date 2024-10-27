@@ -36,14 +36,29 @@
         />
       </div>
 
+      <!-- 태그 선택 체크박스 -->
       <div class="mb-4">
-        <label for="tags" class="block text-sm font-medium text-gray-700">Tags</label>
-        <input
-            v-model="form.tags"
-            type="text"
-            id="tags"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-        />
+        <label class="block text-sm font-medium text-gray-700">Tags</label>
+        <div class="mt-1">
+          <label class="inline-flex items-center">
+            <input
+                type="checkbox"
+                v-model="form.tags"
+                value="질문"
+                class="form-checkbox"
+            />
+            <span class="ml-2">질문</span>
+          </label>
+          <label class="inline-flex items-center ml-4">
+            <input
+                type="checkbox"
+                v-model="form.tags"
+                value="불만"
+                class="form-checkbox"
+            />
+            <span class="ml-2">불만</span>
+          </label>
+        </div>
       </div>
 
       <div class="mb-4">
@@ -80,19 +95,22 @@ const form = ref({
   title: '',
   content: '',
   writer: '',
-  tags: ''
+  tags: [] // 배열로 초기화하여 다중 선택 가능
 });
 
 // 파일 입력을 참조하는 변수
 const fileInput = ref(null);
 
-// // 파일 업로드로 인해 formData의 형태로
 const handleSubmit = async () => {
   const formData = new FormData();
   formData.append('title', form.value.title);
   formData.append('content', form.value.content);
   formData.append('writer', form.value.writer);
-  formData.append('tags', form.value.tags);
+
+  // 선택된 tags 배열을 반복문으로 추가
+  form.value.tags.forEach(tag => {
+    formData.append('tags', tag);
+  });
 
   // 선택한 파일 추가
   const files = fileInput.value.files;

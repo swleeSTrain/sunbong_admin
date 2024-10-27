@@ -14,11 +14,36 @@
           v-model="searchParams.keyword"
           type="text"
           placeholder="검색어를 입력하세요"
+          @keydown="onEnterKey"
           class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <button @click="search" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none">
-        검색
+        Search
       </button>
+      <button @click="cleanAndLoad" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none">
+        Clean
+      </button>
+    </div>
+
+    <!-- 태그 선택 -->
+    <div class="flex space-x-2 mb-4">
+      <button
+          v-for="tags in ['전체', '질문', '불만']"
+          :key="tags"
+          @click="selectTags(tags)"
+          :class="{
+        'bg-blue-500 text-white border-blue-500': selectedTags === tags,
+        'bg-white text-gray-700 border-gray-300': selectedTags !== tags
+      }"
+          class="px-6 py-2 whitespace-nowrap rounded-full border transition duration-200 focus:outline-none"
+      >
+        {{ tags }}
+      </button>
+    </div>
+
+    <!-- 검색 결과가 없을 때 메시지 -->
+    <div v-if="result.dtoList.length === 0" class="flex items-center h-20 text-2xl text-gray-500 mb-4 ml-1">
+      검색 결과가 없습니다.
     </div>
 
     <!-- 질문 리스트 -->
@@ -27,6 +52,7 @@
           :key="question.qno"
           class="py-4 cursor-pointer hover:bg-gray-100"
           @click="moveToRead(question.qno)">
+        <span class="font-medium text-lg">{{ question.qno }}</span>
         <div class="flex justify-between">
           <span class="font-medium text-lg">{{ question.title }}</span>
           <span class="text-sm text-gray-500">{{ question.createdDate }}</span>
@@ -58,5 +84,8 @@
 import useListData from '../../hooks/useQnaListData.js';
 import { getListQuestion } from '../../apis/QnaAPI.js';
 
-const { result, pageArr, loadPageData, moveToRead, searchParams, search } = useListData(getListQuestion);
+const { result, pageArr, loadPageData, moveToRead,
+  searchParams, search, onEnterKey, cleanAndLoad,
+  selectTags, selectedTags } = useListData(getListQuestion);
+
 </script>
