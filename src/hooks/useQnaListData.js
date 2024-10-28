@@ -118,6 +118,20 @@ const useQnaListData = (listFn) => {
         loadPageData(route.query.page || 1); // 데이터 새로고침 시
     });
 
+    // onBeforeRouteUpdate((to, from, next) => {
+    //
+    //     console.log("onBefore 확인 --------------------");
+    //
+    //     // 쿼리스트링에서 페이지와 검색 조건 값을 가져와 로드
+    //     const page = route.query.page ? parseInt(route.query.page, 10) : pageStore.currentPage;
+    //     searchParams.value.type = route.query.type || searchStore.type || 'all';
+    //     searchParams.value.keyword = route.query.keyword || searchStore.keyword || '';
+    //     selectedTags.value = route.query.tags || '전체';
+    //
+    //     loadPageData(page);
+    //     next();
+    // });
+
     // 상세 페이지로 이동
     const moveToRead = (qno) => {
         // 현재 페이지, 검색 조건을 쿼리스트링으로 유지하면서 상세 페이지로 이동

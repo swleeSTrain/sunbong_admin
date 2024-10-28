@@ -56,6 +56,10 @@ export const deleteQuestion = async (qno) => {
 // 질문 수정
 export const putEditQuestion = async (qno, formData) => {
 
+    console.log(qno);
+    console.log("=================");
+    console.log(formData);
+
     try {
 
         const res = await axios.put(`${hostQuestion}/${qno}`, formData, {

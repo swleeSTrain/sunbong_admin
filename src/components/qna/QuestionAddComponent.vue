@@ -59,6 +59,7 @@
             <span class="ml-2">불만</span>
           </label>
         </div>
+        <p v-if="errorMessage" class="text-red-500 text-sm mt-1">{{ errorMessage }}</p> <!-- 에러 메시지 표시 -->
       </div>
 
       <div class="mb-4">
@@ -83,9 +84,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { postAddQuestion } from '../../apis/QnaAPI.js';
-import { useRouter } from 'vue-router';
+import {ref} from 'vue';
+import {postAddQuestion} from '../../apis/QnaAPI.js';
+import {useRouter} from 'vue-router';
 import Swal from 'sweetalert2';
 
 const router = useRouter();
@@ -98,10 +99,19 @@ const form = ref({
   tags: [] // 배열로 초기화하여 다중 선택 가능
 });
 
+// 에러 메시지를 저장할 변수
+const errorMessage = ref('');
+
 // 파일 입력을 참조하는 변수
 const fileInput = ref(null);
 
 const handleSubmit = async () => {
+  // 태그 선택 유효성 검사
+  if (form.value.tags.length === 0) {
+    errorMessage.value = "태그를 선택해야 합니다."; // 에러 메시지 설정
+    return; // 제출을 중단
+  }
+
   const formData = new FormData();
   formData.append('title', form.value.title);
   formData.append('content', form.value.content);
@@ -144,3 +154,7 @@ const handleSubmit = async () => {
   }
 };
 </script>
+
+<style scoped>
+/* 필요한 스타일 추가 */
+</style>

@@ -147,37 +147,28 @@ const moveToList = () => {
 const fileInput = ref(null);
 
 const handleEdit = async () => {
+
   const qno = route.params.qno;
   const formData = new FormData();
+
+  // 기본 데이터 추가
   formData.append('title', form.value.title);
   formData.append('content', form.value.content);
   formData.append('writer', form.value.writer);
 
   // 태그 배열 추가
-  form.value.tags.forEach(tag => {
-    formData.append('tags', tag);
-  });
+  form.value.tags.forEach(tag => formData.append('tags', tag));
 
-  // 기존에 서버에 저장된 파일 리스트를 가져오는 부분 추가 (가정: 기존 파일 리스트를 불러와 화면에 표시함)
-  const existingFiles = question.value.attachFiles || []; // 서버에서 가져온 기존 파일 리스트
-
-  // 삭제할 파일과 새로 추가할 파일을 구분해서 처리
-  // 예: 사용자가 특정 파일을 삭제하면 deletedFiles에 추가되도록 관리
-  const deletedFiles = form.value.deletedFiles || []; // 삭제할 파일 리스트
-  deletedFiles.forEach((file) => {
-    formData.append('deletedFiles', file); // 삭제할 파일 이름을 추가
-  });
-
-  // fileInput을 통한 새 파일 추가
+  // 새 파일 추가
   const files = fileInput.value?.files;
   if (files && files.length > 0) {
     for (let i = 0; i < files.length; i++) {
-      formData.append('newFiles', files[i]); // 새 파일은 "newFiles" 필드로 추가
+      formData.append('files', files[i]);
     }
   }
 
   try {
-    await putEditQuestion(qno, formData); // 서버에서 새로 추가된 파일과 삭제된 파일만 처리하도록 수정 필요
+    await putEditQuestion(qno, formData);
     Swal.fire({
       icon: 'success',
       title: '수정 완료!',
@@ -194,8 +185,6 @@ const handleEdit = async () => {
     });
   }
 };
-
-
 
 const handleDelete = async () => {
   const qno = route.params.qno;
