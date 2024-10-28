@@ -87,11 +87,11 @@ export const postAddAnswer = async (obj) => {
 //
 //     return res.data
 // }
-//
-// // 답변 삭제
-// export const deleteQuestion = async (qno) => {
-//
-//     const res = await axios.delete(`${hostAnswer}/${qno}`)
-//
-//     return res.data
-// }
+
+// 답변 삭제
+export const deleteAnswer = async (qno) => {
+
+    const res = await axios.delete(`${hostAnswer}/${qno}`)
+
+    return res.data
+}

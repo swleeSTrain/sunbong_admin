@@ -11,6 +11,13 @@
         <p class="text-sm text-gray-600">작성자: {{ answer.writer }}</p>
         <p class="text-sm text-gray-600">작성일: {{ answer.createdDate }}</p>
       </div>
+
+      <button
+          class="mt-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+          @click="handleDelete(answer.ano)"
+      >
+        삭제
+      </button>
     </div>
 
     <AnswerAddComponent></AnswerAddComponent>
@@ -20,6 +27,8 @@
 <script setup>
 import { defineProps } from 'vue';
 import AnswerAddComponent from "./AnswerAddComponent.vue";
+import { deleteAnswer } from '../../apis/QnaAPI.js';
+import Swal from "sweetalert2";
 
 const props = defineProps({
   answers: {
@@ -27,4 +36,36 @@ const props = defineProps({
     required: true,
   },
 });
+
+const handleDelete = async (ano) => {
+  Swal.fire({
+    title: '정말 삭제하시겠습니까?',
+    text: '삭제하면 복구할 수 없습니다!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '삭제',
+    cancelButtonText: '취소'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        await deleteAnswer(ano);
+        Swal.fire({
+          icon: 'success',
+          title: '삭제 완료!',
+          text: '답변이 성공적으로 삭제되었습니다.',
+        }).then(() => {
+
+          location.reload();
+        });
+      } catch (error) {
+        console.error('Failed to delete answer:', error);
+        Swal.fire({
+          icon: 'error',
+          title: '오류 발생',
+          text: '답변을 삭제하는 도중 오류가 발생했습니다.',
+        });
+      }
+    }
+  });
+};
 </script>
