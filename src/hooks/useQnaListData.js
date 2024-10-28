@@ -1,4 +1,3 @@
-
 import { computed, onMounted, ref, watch } from 'vue';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { usePage } from '../store/usePage';
@@ -67,8 +66,8 @@ const useQnaListData = (listFn) => {
             ...(selectedTags.value !== '전체' && { tags: selectedTags.value })
         };
 
-        // 쿼리스트링 업데이트
-        router.push({
+        // 쿼리스트링 업데이트 (replace 사용)
+        router.replace({
             path: route.path,
             query
         });
@@ -101,26 +100,22 @@ const useQnaListData = (listFn) => {
     });
 
     onMounted(() => {
+        console.log("onMounted 확인 --------------------");
+
         // 쿼리스트링에서 페이지와 검색 조건 값을 가져와 로드
         const page = route.query.page ? parseInt(route.query.page, 10) : pageStore.currentPage;
         searchParams.value.type = route.query.type || searchStore.type || 'all';
         searchParams.value.keyword = route.query.keyword || searchStore.keyword || '';
-        selectedTags.value = route.query.tags || '전체'; // 태그 초기화
+        selectedTags.value = route.query.tags || '전체';
+
         loadPageData(page);
     });
 
     watch(refresh, () => {
-        loadPageData(route.query.page || 1); // 데이터 새로고침 시
-    });
 
-    onBeforeRouteUpdate((to, from, next) => {
-        // 페이지, 검색 조건 변경 시 쿼리스트링을 반영하여 페이지 로드
-        const page = to.query.page ? parseInt(to.query.page, 10) : pageStore.currentPage;
-        searchParams.value.type = to.query.type || 'all';
-        searchParams.value.keyword = to.query.keyword || '';
-        selectedTags.value = to.query.tags || '전체'; // 태그 업데이트
-        loadPageData(page);
-        next();
+        console.log("watch 확인 --------------------");
+
+        loadPageData(route.query.page || 1); // 데이터 새로고침 시
     });
 
     // 상세 페이지로 이동
