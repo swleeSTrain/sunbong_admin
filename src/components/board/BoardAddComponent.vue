@@ -16,7 +16,7 @@
         <label for="author" class="block text-gray-600 font-medium">Author:</label>
         <input
             type="text"
-            v-model="postForm.author"
+            v-model="postForm.writer"
             id="author"
             required
             class="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -59,7 +59,7 @@ export default {
     return {
       postForm: {
         title: '',
-        author: '',
+        writer: '',
         content: '',
       },
       files: [],
@@ -71,8 +71,8 @@ export default {
     },
     async handleSubmit() {
       try {
-        const response = await postBoardOne(this.postForm, this.files);
-        alert('Post created with ID: ' + response);
+        await postBoardOne(this.postForm, this.files)
+
         this.$router.push('/board/list');
       } catch (error) {
         console.error('Error creating post:', error);

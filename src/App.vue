@@ -9,21 +9,10 @@
       <h1 class="text-3xl font-bold text-white uppercase tracking-widest">ERP System</h1>
       <nav class="space-y-4">
         <!-- RouterLink로 링크를 연결 -->
-        <RouterLink to="/notice/list" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">
-          NOTICE
+        <RouterLink to="/board/list" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">
+          Board
         </RouterLink>
-        <RouterLink to="/qna/question/list" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">
-          QnA
-        </RouterLink>
-        <RouterLink to="/qna/question/add" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">
-          QnA Register
-        </RouterLink>
-        <!--        <RouterLink to="/sales-management" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">-->
-        <!--          QNA-->
-        <!--        </RouterLink>-->
-        <!--        <RouterLink to="/reports" class="block py-4 px-6 text-white bg-gray-700 hover:bg-gray-600 hover:shadow-lg transition duration-300 rounded-lg">-->
-        <!--          FAQ-->
-        <!--        </RouterLink>-->
+
       </nav>
     </aside>
     <!-- Main Content -->

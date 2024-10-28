@@ -7,9 +7,25 @@ const boardRouting={
     path: '/board',
     children: [
         { path: "list", component: BoardListPage},
-        { path: "", redirect: '/board/list?page=1' },
-        { path: "read/:boardNo", component: BoardReadPage, props: true },
-        { path: "update/:boardNo", component: BoardUpdatePage, props: true },
+        {
+            path: "",
+            redirect: (to) => {
+                return { path: '/board/list', query: { page: to.query.page || '1', type: to.query.type || 'all', keyword: to.query.keyword || '' } };
+            }
+        },
+        { path: "read/:bno", component: BoardReadPage,
+            props: (route) => ({
+                bno: route.params.bno,
+                page: route.query.page,
+                type: route.query.type,
+                keyword: route.query.keyword
+            }) },
+        { path: "update/:bno", component: BoardUpdatePage, props: (route) => ({
+                bno: route.params.bno,
+                page: route.query.page,
+                type: route.query.type,
+                keyword: route.query.keyword
+            }) },
         { path: "add", component: BoardAddPage}
     ]
 

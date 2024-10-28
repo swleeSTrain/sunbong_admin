@@ -13,6 +13,10 @@
         />
       </div>
       <div>
+        <label class="block text-gray-600 font-medium">Writer:</label>
+        <p class="w-full p-2 mt-1 bg-gray-100 rounded-md">{{ boardData.writer }}</p>
+      </div>
+      <div>
         <label for="content" class="block text-gray-600 font-medium">Content:</label>
         <textarea
             id="content"
@@ -41,40 +45,60 @@
   </div>
 </template>
 
-<script>
-import { putBoardOne } from "../../apis/boardApi";
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { putBoardOne, getBoardOne } from "../../apis/boardApi";
 
-export default {
-  props: {
-    boardBno: {
-      type: Number,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      boardData: {
-        title: "",
-        content: "",
-      },
-      files: [],
-    };
-  },
-  methods: {
-    handleFileUpload(event) {
-      this.files = Array.from(event.target.files);
-    },
-    async submitForm() {
-      try {
-        const response = await putBoardOne(this.boardBno, this.boardData, this.files);
-        console.log("Post updated successfully:", response);
-        this.$emit("post-updated");
-      } catch (error) {
-        console.error("Error updating post:", error);
-      }
-    },
-  },
+const props = defineProps({
+  bno: {
+    type: String,
+    required: true,
+  }
+});
+const boardData = ref({
+  title: '',
+  writer: '',
+  content: '',
+  filename: [],
+  createTime: '',
+  updateTime: '',
+});
+const router = useRouter();
+
+const files = ref([]);
+const fetchBoardData = async () => {
+  try {
+    const response = await getBoardOne(props.bno);
+    if (response && response.dtoList && response.dtoList.length > 0) {
+      boardData.value = response.dtoList[0];
+    } else {
+      console.error('No data found for the given board number.');
+    }
+  } catch (error) {
+    console.error('Error fetching board data:', error);
+  }
 };
+
+
+const handleFileUpload = (event) => {
+  files.value = Array.from(event.target.files);
+};
+
+const submitForm = async () => {
+  try {
+    const { title, content } = boardData.value;
+    await putBoardOne(props.bno, { title, content }, files.value);
+    router.push('/board/list');
+  } catch (error) {
+    console.error("Error updating post:", error);
+    alert("Failed to update post");
+  }
+};
+
+onMounted(fetchBoardData);
 </script>
 
-<style scoped></style>
+<style scoped>
+/* TailwindCSS 기반으로 기본 스타일을 추가하므로 별도의 CSS는 최소화 */
+</style>

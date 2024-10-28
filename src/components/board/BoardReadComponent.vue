@@ -4,7 +4,7 @@
     <div class="border-b pb-4 mb-6">
       <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ boardData.title }}</h2>
       <p class="text-sm text-gray-500">
-        <span class="font-semibold">Author:</span> {{ boardData.author || 'Anonymous' }} &bull;
+        <span class="font-semibold">Writer:</span> {{ boardData.writer || 'Anonymous' }} &bull;
         <span class="font-semibold">Created:</span> {{ boardData.createTime || 'N/A' }} &bull;
         <span class="font-semibold">Updated:</span> {{ boardData.updateTime || 'N/A' }}
       </p>
@@ -36,11 +36,7 @@
             :key="file"
             class="text-blue-500 hover:underline cursor-pointer flex items-center space-x-2"
         >
-          <img v-if="isImage(file)" :src="getImageUrl(file)" class="w-32 h-32 object-contain" alt="Attached Image" />
-          <svg v-else class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2h12a2 2v-2M4 12l6 6M10 6v6M6 10v6h6"></path>
-          </svg>
-          <span>{{ file }}</span>
+          <a :href="downloadFile(file)" :download=file>{{file}}</a>
         </li>
       </ul>
     </div>
@@ -73,9 +69,10 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { getBoardOne, deleteBoardOne } from '../../apis/boardAPI';
+import {downloadFile, viewFileImage} from "../../apis/FileAPI.js";
 
 const props = defineProps({
-  boardNo: {
+  bno: {
     type: String,
     required: true,
   }
@@ -83,7 +80,7 @@ const props = defineProps({
 
 const boardData = ref({
   title: '',
-  author: '',
+  writer: '',
   content: '',
   filename: [],
   createTime: '',
@@ -94,7 +91,7 @@ const router = useRouter();
 
 const fetchBoardData = async () => {
   try {
-    const response = await getBoardOne(props.boardNo);
+    const response = await getBoardOne(props.bno);
     if (response && response.dtoList && response.dtoList.length > 0) {
       boardData.value = response.dtoList[0];
     } else {
@@ -110,28 +107,22 @@ const nonThumbnailFiles = computed(() =>
     boardData.value.filename.filter(file => !file.startsWith('s_'))
 );
 
-const isImage = (fileName) => {
-  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-  const ext = fileName.split('.').pop().toLowerCase();
-  return imageExtensions.includes(ext);
-};
 
-const BASE_URL = "http://localhost:8080/uploads/";
 
-const getImageUrl = (fileName) => `${BASE_URL}${fileName}`;
+const getImageUrl = (fileName) => viewFileImage(fileName);
 
 const goBack = () => {
   router.push('/board/list');
 };
 
 const editPost = () => {
-  router.push(`/board/update/${props.boardNo}`);
+  router.push(`/board/update/${props.bno}`);
 };
 
 const deletePost = async () => {
   if (confirm('Are you sure you want to delete this post?')) {
     try {
-      await deleteBoardOne(props.boardNo);
+      await deleteBoardOne(props.bno);
       console.log('Post deleted successfully.');
       goBack();
     } catch (error) {
