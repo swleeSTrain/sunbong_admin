@@ -1,4 +1,4 @@
-<!-- Answer Read Component -->
+
 <template>
   <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
     <h1 class="text-2xl font-bold mb-4">Answer Read Component</h1>
@@ -12,11 +12,14 @@
         <p class="text-sm text-gray-600">작성일: {{ answer.createdDate }}</p>
       </div>
     </div>
+
+    <AnswerAddComponent></AnswerAddComponent>
   </div>
 </template>
 
 <script setup>
 import { defineProps } from 'vue';
+import AnswerAddComponent from "./AnswerAddComponent.vue";
 
 const props = defineProps({
   answers: {

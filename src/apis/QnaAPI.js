@@ -56,10 +56,6 @@ export const deleteQuestion = async (qno) => {
 // 질문 수정
 export const putEditQuestion = async (qno, formData) => {
 
-    console.log(qno);
-    console.log("=================");
-    console.log(formData);
-
     try {
 
         const res = await axios.put(`${hostQuestion}/${qno}`, formData, {
@@ -75,15 +71,14 @@ export const putEditQuestion = async (qno, formData) => {
     }
 };
 
+// 답변 등록
+export const postAddAnswer = async (obj) => {
 
-//
-// // 답변 등록
-// export const postAddQuestion = async (obj) => {
-//
-//     const res = await axios.post(`${hostAnswer}/add`, obj)
-//
-//     return res.data
-// }
+    const res = await axios.post(`${hostAnswer}/add`, obj)
+
+    return res.data
+}
+
 //
 // // 답변 수정
 // export const putEditQuestion = async (question) => {
