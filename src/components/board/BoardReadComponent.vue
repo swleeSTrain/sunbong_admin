@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-lg">
+  <div>
     <!-- 타이틀 섹션 -->
     <div class="border-b pb-4 mb-6">
       <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ boardData.title }}</h2>
@@ -13,12 +13,12 @@
     <!-- 내용 섹션 -->
     <div class="mb-8">
       <!-- 썸네일을 제외한 모든 이미지 출력 -->
-      <div v-if="nonThumbnailFiles.length" class="mb-6">
+      <div v-if="nonThumbnailFiles.length" class="mb-6 flex flex-wrap gap-4">
         <img
             v-for="file in nonThumbnailFiles"
             :src="getImageUrl(file)"
             :key="file"
-            class="w-1/4 h-auto object-contain rounded-lg mb-4"
+            class="w-1/4 h-auto object-contain rounded-lg"
             alt="Attached Image"
         />
       </div>
@@ -30,15 +30,20 @@
     <!-- 첨부 파일 섹션 -->
     <div v-if="boardData.filename && boardData.filename.length > 0" class="mb-8">
       <h3 class="text-xl font-semibold text-gray-800 mb-2">Attached Files:</h3>
-      <ul class="list-disc pl-6 space-y-2">
-        <li
+      <div class="flex flex-wrap gap-4">
+        <a
             v-for="file in boardData.filename"
             :key="file"
-            class="text-blue-500 hover:underline cursor-pointer flex items-center space-x-2"
+            :href="downloadFile(file)"
+            :download="file"
+            class="text-blue-500 hover:underline cursor-pointer flex items-center space-x-2 bg-gray-100 rounded-lg px-3 py-2"
         >
-          <a :href="downloadFile(file)" :download=file>{{file}}</a>
-        </li>
-      </ul>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>{{file}}</span>
+        </a>
+      </div>
     </div>
 
     <!-- 버튼 섹션 -->

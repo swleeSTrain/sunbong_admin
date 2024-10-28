@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+  <div>
     <h2 class="text-2xl font-bold text-gray-700 mb-4">Edit Post</h2>
     <form @submit.prevent="submitForm" class="space-y-4">
       <div>

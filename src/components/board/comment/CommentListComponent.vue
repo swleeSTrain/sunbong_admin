@@ -1,6 +1,6 @@
 <!-- CommentList.vue -->
 <template>
-  <div class="bg-white shadow-md rounded-lg p-6">
+  <div>
     <h3 class="text-2xl font-bold text-gray-800 mb-4">댓글 목록</h3>
     <ul v-if="comments.length > 0" class="space-y-4">
       <li v-for="comment in comments" :key="comment.cno"

@@ -1,6 +1,6 @@
 <!-- CommentForm.vue -->
 <template>
-  <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+  <div>
     <h3 class="text-2xl font-bold text-gray-800 mb-4">댓글 작성</h3>
     <form @submit.prevent="submitComment" class="space-y-4">
       <div>
