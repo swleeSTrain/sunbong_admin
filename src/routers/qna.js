@@ -11,7 +11,7 @@ const qnaRouting ={
     children: [
         { path: 'question/list', component: QuestionListPage },
         // { path: '', redirect: '/qna/list?page=1' },  // 기본 경로 리디렉션
-        { path: 'question/:qno', component: QuestionReadPage },
+        { path: 'question/read/:qno', component: QuestionReadPage },
         { path: 'question/edit/:qno', component: QuestionEditPage },
         { path: 'question/add', component: QuestionAddPage },
         { path: "", redirect: '/qna/question/list?page=1' },
