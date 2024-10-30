@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from "vue-router";
 import noticeRouting from "./notice";
 import qnaRouting from "./qna.js";
 
-const MainPage = () => import("../pages/MainPage.vue")
+import boardRouting from "./board.js";
 
 
 const routeConfig = createRouter({
@@ -10,7 +10,8 @@ const routeConfig = createRouter({
     routes: [
         {path: "/", component: MainPage},
         noticeRouting,
-        qnaRouting
+        qnaRouting,
+        boardRouting,
     ]
 })
 
