@@ -30,6 +30,11 @@ import { ref } from 'vue'
 <!--        </RouterLink>-->
       </nav>
     </aside>
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 p-8 bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg">
+      <!-- 페이지의 동적인 콘텐츠가 렌더링될 영역 -->
+      <RouterView></RouterView>
+    </main>
   </div>
 </template>
 
